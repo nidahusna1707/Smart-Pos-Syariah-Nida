@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart POS Syariah</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #181c27;
+      --card: #1e2336;
+      --border: #2a3050;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --green: #2ecc71;
+      --red: #e74c3c;
+      --text: #eef0f7;
+      --muted: #7a8199;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: var(--gold-light);
+      letter-spacing: 0.5px;
+    }
+
+    .logo span {
+      font-size: 11px;
+      color: var(--muted);
+      display: block;
+      font-weight: 300;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .status-badge {
+      background: rgba(46,204,113,0.15);
+      color: var(--green);
+      border: 1px solid rgba(46,204,113,0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* MAIN LAYOUT */
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 0;
+      flex: 1;
+      height: calc(100vh - 67px);
+    }
+
+    /* LEFT PANEL */
+    .left-panel {
+      padding: 24px;
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* SEARCH */
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .search-bar input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar input:focus { border-color: var(--gold); }
+    .search-bar input::placeholder { color: var(--muted); }
+
+    /* PRODUCT GRID */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px;
+    }
+
+    .product-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(201,168,76,0.12);
+    }
+
+    .product-card:active { transform: translateY(0); }
+
+    .product-emoji {
+      font-size: 32px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .product-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .product-price {
+      font-size: 13px;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .product-stock {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .halal-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: rgba(46,204,113,0.15);
+      border: 1px solid rgba(46,204,113,0.3);
+      color: var(--green);
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* RIGHT PANEL */
+    .right-panel {
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .cart-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cart-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: var(--gold-light);
+    }
+
+    /* CART ITEMS */
+    .cart-items {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 24px;
+    }
+
+    .cart-empty {
+      text-align: center;
+      padding: 40px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .cart-empty span { font-size: 36px; display: block; margin-bottom: 10px; }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      animation: slideIn 0.2s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .cart-item-emoji { font-size: 24px; }
+
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-size: 13px; font-weight: 500; }
+    .cart-item-price { font-size: 12px; color: var(--gold); margin-top: 2px; }
+
+    .cart-item-qty {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .qty-btn {
+      width: 26px; height: 26px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .qty-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .qty-num { font-size: 13px; font-weight: 600; min-width: 20px; text-align: center; }
+
+    /* SUMMARY */
+    .cart-summary {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .summary-row.total {
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .summary-row.total span:last-child { color: var(--gold-light); }
+
+    /* AI AUDIT RESULT */
+    .ai-audit {
+      margin: 12px 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .ai-audit-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ai-dot {
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .ai-result {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .ai-result.success { color: var(--green); font-style: normal; font-weight: 500; }
+    .ai-result.warning { color: #f39c12; font-style: normal; }
+
+    /* CHECKOUT BTN */
+    .checkout-btn {
+      margin: 0 24px 24px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #0f1117;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+    }
+
+    .checkout-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(201,168,76,0.35);
+    }
+
+    .checkout-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.show { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      width: 380px;
+      animation: modalIn 0.3s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.9) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: var(--gold-light);
+      margin-bottom: 20px;
+    }
+
+    .modal-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .modal-total {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gold-light);
+      text-align: center;
+      padding: 16px;
+      background: var(--card);
+      border-radius: 12px;
+      margin: 16px 0;
+    }
+
+    .modal-input {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .modal-input:focus { border-color: var(--gold); }
+
+    .kembalian {
+      text-align: center;
+      font-size: 14px;
+      color: var(--green);
+      font-weight: 600;
+      margin-bottom: 16px;
+      min-height: 20px;
+    }
+
+    .modal-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn-cancel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      padding: 12px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-cancel:hover { border-color: var(--red); color: var(--red); }
+
+    .btn-confirm {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: none;
+      border-radius: 10px;
+      color: #0f1117;
+      padding: 12px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+
+    .btn-confirm:hover { box-shadow: 0 4px 16px rgba(201,168,76,0.3); }
+
+    /* SUCCESS MODAL */
+    .success-modal {
+      text-align: center;
+    }
+
+    .success-icon { font-size: 56px; margin-bottom: 16px; display: block; }
+
+    .success-modal h3 {
+      color: var(--green);
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .success-modal p { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+
+    .btn-close {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 12px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-close:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🕌</div>
+    <div>
+      <h1>Smart POS Syariah</h1>
+      <span>Sistem Informasi Akuntansi — Kelompok Anda</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <span id="datetime"></span>
+    <div class="status-badge">● Sistem Aktif</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT: PRODUK -->
+  <div class="left-panel">
+    <div class="section-title">Daftar Produk</div>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Cari produk..." oninput="filterProducts()"/>
+    </div>
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+
+  <!-- RIGHT: KERANJANG -->
+  <div class="right-panel">
+    <div class="cart-header">
+      <h2>🛒 Keranjang Belanja</h2>
+    </div>
+
+    <div class="cart-items" id="cartItems">
+      <div class="cart-empty" id="cartEmpty">
+        <span>🧺</span>
+        Belum ada produk dipilih.<br/>Klik produk untuk menambahkan.
+      </div>
+    </div>
+
+    <div class="cart-summary">
+      <div class="summary-row"><span>Subtotal</span><span id="subtotal">Rp 0</span></div>
+      <div class="summary-row"><span>PPN (11%)</span><span id="ppn">Rp 0</span></div>
+      <div class="summary-row total"><span>TOTAL</span><span id="total">Rp 0</span></div>
+    </div>
+
+    <!-- AI AUDIT RESULT -->
+    <div class="ai-audit">
+      <div class="ai-audit-title">
+        <div class="ai-dot"></div>
+        AI Audit Result
+      </div>
+      <div class="ai-result" id="aiResult">
+        Menunggu transaksi... AI Agent akan memvalidasi setiap produk secara otomatis.
+      </div>
+    </div>
+
+    <button class="checkout-btn" id="checkoutBtn" onclick="openCheckout()" disabled>
+      Proses Pembayaran →
+    </button>
+  </div>
+</div>
+
+<!-- MODAL CHECKOUT -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal">
+    <h3>💳 Konfirmasi Pembayaran</h3>
+    <div class="modal-row"><span>Subtotal</span><span id="m-subtotal"></span></div>
+    <div class="modal-row"><span>PPN (11%)</span><span id="m-ppn"></span></div>
+    <div class="modal-total" id="m-total"></div>
+    <input class="modal-input" type="number" id="bayarInput" placeholder="Masukkan nominal uang tunai (Rp)" oninput="hitungKembalian()"/>
+    <div class="kembalian" id="kembalianText"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeCheckout()">Batal</button>
+      <button class="btn-confirm" onclick="confirmPayment()">Bayar ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCCESS -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal success-modal">
+    <span class="success-icon">✅</span>
+    <h3>Transaksi Berhasil!</h3>
+    <p id="successMsg"></p>
+    <p style="color: var(--green); font-size:12px; margin-bottom:16px;">
+      ✓ Transaksi telah diaudit oleh AI Agent & sesuai prinsip Syariah
+    </p>
+    <button class="btn-close" onclick="closeSuccess()">Transaksi Baru</button>
+  </div>
+</div>
+
+<script>
+  // DATA PRODUK
+  const products = [
+    { id: 1, name: "Kurma Ajwa", price: 85000, stock: 50, emoji: "🫘", halal: true },
+    { id: 2, name: "Madu Hutan", price: 120000, stock: 30, emoji: "🍯", halal: true },
+    { id: 3, name: "Susu Kambing", price: 35000, stock: 40, emoji: "🥛", halal: true },
+    { id: 4, name: "Roti Gandum", price: 25000, stock: 60, emoji: "🍞", halal: true },
+    { id: 5, name: "Teh Herbal", price: 45000, stock: 25, emoji: "🍵", halal: true },
+    { id: 6, name: "Minyak Zaitun", price: 75000, stock: 20, emoji: "🫙", halal: true },
+    { id: 7, name: "Kismis", price: 30000, stock: 45, emoji: "🍇", halal: true },
+    { id: 8, name: "Sari Delima", price: 55000, stock: 15, emoji: "🍹", halal: true },
+  ];
+
+  let cart = {};
+
+  // RENDER PRODUK
+  function renderProducts(list) {
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = list.map(p => `
+      <div class="product-card" onclick="addToCart(${p.id})">
+        ${p.halal ? '<div class="halal-badge">HALAL</div>' : ''}
+        <span class="product-emoji">${p.emoji}</span>
+        <div class="product-name">${p.name}</div>
+        <div class="product-price">${formatRp(p.price)}</div>
+        <div class="product-stock">Stok: ${p.stock}</div>
+      </div>
+    `).join('');
+  }
+
+  function filterProducts() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    renderProducts(products.filter(p => p.name.toLowerCase().includes(q)));
+  }
+
+  // CART LOGIC
+  function addToCart(id) {
+    const p = products.find(x => x.id === id);
+    if (!p || p.stock <= 0) return;
+    if (!cart[id]) cart[id] = { ...p, qty: 0 };
+    if (cart[id].qty >= p.stock) return;
+    cart[id].qty++;
+    renderCart();
+    runAIAudit();
+  }
+
+  function changeQty(id, delta) {
+    if (!cart[id]) return;
+    cart[id].qty += delta;
+    if (cart[id].qty <= 0) delete cart[id];
+    renderCart();
+    runAIAudit();
+  }
+
+  function renderCart() {
+    const container = document.getElementById('cartItems');
+    const empty = document.getElementById('cartEmpty');
+    const keys = Object.keys(cart);
+
+    if (keys.length === 0) {
+      empty.style.display = 'block';
+      container.innerHTML = '';
+      container.appendChild(empty);
+      updateSummary(0);
+      document.getElementById('checkoutBtn').disabled = true;
+      document.getElementById('aiResult').textContent = 'Menunggu transaksi... AI Agent akan memvalidasi setiap produk secara otomatis.';
+      document.getElementById('aiResult').className = 'ai-result';
+      return;
+    }
+
+    empty.style.display = 'none';
+    container.innerHTML = keys.map(id => {
+      const item = cart[id];
+      return `
+        <div class="cart-item">
+          <span class="cart-item-emoji">${item.emoji}</span>
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-price">${formatRp(item.price * item.qty)}</div>
+          </div>
+          <div class="cart-item-qty">
+            <button class="qty-btn" onclick="changeQty(${id}, -1)">−</button>
+            <span class="qty-num">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${id}, +1)">+</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const subtotal = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
+    updateSummary(subtotal);
+    document.getElementById('checkoutBtn').disabled = false;
+  }
+
+  function updateSummary(subtotal) {
+    const ppn = subtotal * 0.11;
+    const total = subtotal + ppn;
+    document.getElementById('subtotal').textContent = formatRp(subtotal);
+    document.getElementById('ppn').textContent = formatRp(ppn);
+    document.getElementById('total').textContent = formatRp(total);
+  }
+
+  // AI AUDIT SIMULATION
+  function runAIAudit() {
+    const el = document.getElementById('aiResult');
+    el.textContent = '⏳ AI Agent sedang mengaudit transaksi...';
+    el.className = 'ai-result';
+    setTimeout(() => {
+      const allHalal = Object.values(cart).every(i => i.halal);
+      if (allHalal) {
+        el.textContent = '✅ Semua produk telah diverifikasi HALAL. Tidak ada pelanggaran akad Syariah terdeteksi. Transaksi dapat dilanjutkan.';
+        el.className = 'ai-result success';
+      } else {
+        el.textContent = '⚠️ Ditemukan produk yang perlu verifikasi lebih lanjut. Harap konfirmasi ke supervisor.';
+        el.className = 'ai-result warning';
+      }
+    }, 1000);
+  }
+
+  // CHECKOUT
+  function openCheckout() {
+    const subtotal = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
+    const ppn = subtotal * 0.11;
+    const total = subtotal + ppn;
+    document.getElementById('m-subtotal').textContent = formatRp(subtotal);
+    document.getElementById('m-ppn').textContent = formatRp(ppn);
+    document.getElementById('m-total').textContent = formatRp(total);
+    document.getElementById('bayarInput').value = '';
+    document.getElementById('kembalianText').textContent = '';
+    document.getElementById('checkoutModal').classList.add('show');
+  }
+
+  function closeCheckout() {
+    document.getElementById('checkoutModal').classList.remove('show');
+  }
+
+  function hitungKembalian() {
+    const subtotal = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
+    const total = subtotal * 1.11;
+    const bayar = parseFloat(document.getElementById('bayarInput').value) || 0;
+    const kembalian = bayar - total;
+    const el = document.getElementById('kembalianText');
+    if (bayar === 0) { el.textContent = ''; return; }
+    if (kembalian < 0) {
+      el.textContent = `Kurang: ${formatRp(Math.abs(kembalian))}`;
+      el.style.color = 'var(--red)';
+    } else {
+      el.textContent = `Kembalian: ${formatRp(kembalian)}`;
+      el.style.color = 'var(--green)';
+    }
+  }
+
+  function confirmPayment() {
+    const subtotal = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
+    const total = subtotal * 1.11;
+    const bayar = parseFloat(document.getElementById('bayarInput').value) || 0;
+    if (bayar < total) { alert('Nominal pembayaran kurang!'); return; }
+    const kembalian = bayar - total;
+    closeCheckout();
+    document.getElementById('successMsg').textContent =
+      `Total: ${formatRp(total)} | Bayar: ${formatRp(bayar)} | Kembalian: ${formatRp(kembalian)}`;
+    document.getElementById('successModal').classList.add('show');
+  }
+
+  function closeSuccess() {
+    document.getElementById('successModal').classList.remove('show');
+    cart = {};
+    renderCart();
+  }
+
+  // UTILS
+  function formatRp(n) {
+    return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+  }
+
+  function updateTime() {
+    const now = new Date();
+    document.getElementById('datetime').textContent =
+      now.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) +
+      ' — ' + now.toLocaleTimeString('id-ID');
+  }
+
+  // INIT
+  renderProducts(products);
+  updateTime();
+  setInterval(updateTime, 1000);
+</script>
+</body>
+</html>
