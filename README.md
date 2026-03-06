@@ -1,31 +1,16 @@
-flowchart TD
-    A([🟢 START: Kasir Membuka Aplikasi POS]) --> B[Kasir Memilih / Scan Produk]
-    B --> C[Antigravity Menerima ID Produk]
-    C --> D{Cek Stok di Supabase}
+# React + Vite
 
-    D -- ❌ Tidak Tersedia --> E[Tampilkan Pesan Error di UI\n'Stok Habis']
-    E --> B
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-    D -- ✅ Tersedia --> F{AI Agent: Validasi Syariah}
-    F -- ❌ Produk Haram /\nMelanggar Akad --> G[Tampilkan Peringatan di UI\n'Produk Tidak Sesuai Syariah']
-    G --> B
+Currently, two official plugins are available:
 
-    F -- ✅ Produk Halal &\nAkad Valid --> H[Tambahkan Produk ke Keranjang]
-    H --> I{Kasir Tambah\nProduk Lain?}
-    I -- Ya --> B
-    I -- Tidak --> J[Hitung Subtotal + PPN]
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-    J --> K[Tampilkan Total di UI]
-    K --> L[Kasir Konfirmasi Pembayaran]
-    L --> M{Metode Pembayaran}
+## React Compiler
 
-    M -- Tunai --> N[Input Nominal Uang]
-    M -- Non-Tunai --> O[Proses Payment Gateway]
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-    N --> P[Hitung Kembalian]
-    O --> P
-    P --> Q[Simpan Transaksi ke Tabel sales di Supabase]
-    Q --> R[AI Agent: Generate Audit Result]
-    R --> S[Cetak / Tampilkan Struk Invoice]
-    S --> T[Update Laporan Kas Real-Time]
-    T --> U([🔴 END: Transaksi Selesai])
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
